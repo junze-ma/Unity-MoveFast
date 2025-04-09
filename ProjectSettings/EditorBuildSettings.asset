@@ -5,9 +5,13 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/MoveFast/Scenes/MoveFast.unity
     guid: 5d1e88001dba59a42aad9f7001281af7
+  - enabled: 1
+    path: Assets/MoveFast/Scenes/MoveFast 3.20.unity
+    guid: 3daf196d1ceaecb4d8ef05730ba3a7d1
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 914787a5382e4df488ae1570d1970e2d, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 7bd564d21fadfcc4ba4d902d48a74585, type: 2}
+    com.unity.xr.openxr.settings4: {fileID: 11400000, guid: e4ec729ba7f661544a0ecae3079eea72, type: 2}
