@@ -11,6 +11,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/MoveFast/Scenes/MoveFast 3.20.unity
     guid: 3daf196d1ceaecb4d8ef05730ba3a7d1
+  - enabled: 0
+    path: Assets/MoveFast/Scenes/MoveFast 1.unity
+    guid: ef062184050f3f74dbbd1f380e4a5aa6
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 914787a5382e4df488ae1570d1970e2d, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 7bd564d21fadfcc4ba4d902d48a74585, type: 2}

@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+﻿// Copyright (c) Meta Platforms, Inc. and affiliates.
 
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -22,8 +22,9 @@ namespace Oculus.Interaction.MoveFast
 
         public void Spawn()
         {
-            var instance = Instantiate(_prefab, transform.position, transform.rotation); //TODO pooling
+            var instance = Instantiate(_prefab, transform.position, transform.rotation); // TODO: use pooling
             instance.SetActive(true);
+
             for (int i = 0; i < _modifiers.Length; i++)
             {
                 _modifiers[i].Modify(instance);
