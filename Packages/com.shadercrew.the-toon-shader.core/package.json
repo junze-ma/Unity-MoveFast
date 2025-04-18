@@ -1,0 +1,32 @@
+{
+  "name": "com.shadercrew.the-toon-shader.core",
+  "displayName": "The Toon Shader",
+  "version": "1.1.1",
+  "author": {
+    "name": "ShaderCrew",
+    "email": "support@shadercrew.com",
+    "url": "https://www.shadercrew.com/"
+  },
+  "unity": "2020.1",
+  "samples": [
+    {
+      "displayName": "The Toon Shader Examples",
+      "description": "Examples of The Toon Shader",
+      "path": "Samples~"
+    },
+    {
+      "displayName": "The Toon X STS Shader Examples(Requires STS Asset and Regular Toon Samples))",
+      "description": "Examples of The Toon Shader combined with STS",
+      "path": "SamplesForSTS~"
+    }
+  ],
+  "keywords": [
+    "Toon Shader",
+    "toon",
+    "cartoon",
+    "Shader"
+  ],
+  "documentationUrl": "",
+  "type": "tool",
+  "hideInEditor": false
+}
