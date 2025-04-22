@@ -1,17 +1,11 @@
-Ôªø// Copyright (c) Meta Platforms, Inc. and affiliates.
-
 using UnityEngine;
 
 namespace Oculus.Interaction.MoveFast
 {
-    /// <summary>
-    /// Increments the player's score and multiplies by velocity.
-    /// </summary>
     public class ScoreIncrementer : MonoBehaviour
     {
         private static ScoreKeeper _score;
 
-        [Tooltip("When assigned, score will only be counted when the ActiveState is true")]
         [SerializeField, Optional]
         private ReferenceActiveState _condition;
 
@@ -25,32 +19,24 @@ namespace Oculus.Interaction.MoveFast
         private float _metersPerSecondMultiplierThreshold = 8f;
 
         [SerializeField]
-        private Spawner _scoreSpawner;
+        private Spawner _scoreSpawner, _failSpawner;
 
-        [SerializeField]
-        private Spawner _failSpawner;
-
-        public int LastScore { get; private set; }
+        public int LastScore { get; private set; }   // œ‘ æ”√£®∫¨º”≥…£©
+        public int RawScore { get; private set; }    // ”√”⁄≈–∂® Perfect / Good
 
         private void Awake()
         {
             _hitDetector.WhenHitResolved += RegisterScore;
         }
 
-        /// <summary>
-        /// Increments the score, optionally using velocity.
-        /// </summary>
         private void RegisterScore()
         {
-            if (_condition.HasReference && !_condition)
-                return;
-
-            if (_score == null && (_score = FindObjectOfType<ScoreKeeper>()) == null)
-                return;
+            if (_condition.HasReference && !_condition) return;
+            if (_score == null && (_score = FindObjectOfType<ScoreKeeper>()) == null) return;
 
             if (_hitDetector.PoseWasCorrect)
             {
-                LastScore = AddScore();
+                CalculateScore();
                 _scoreSpawner.Spawn();
             }
             else
@@ -60,22 +46,24 @@ namespace Oculus.Interaction.MoveFast
             }
         }
 
-        private int AddScore()
+        private void CalculateScore()
         {
+            float speed = 0f;
+
             if (_includeVelocity && _hitDetector.LastHand.TryGetAspect<RawHandVelocity>(out var velocityCalculator))
             {
-                // Record the speed of the hit, to display on the results screen.
-                var speed = velocityCalculator.CalculateThrowVelocity(transform).LinearVelocity.magnitude;
+                speed = velocityCalculator.CalculateThrowVelocity(transform).LinearVelocity.magnitude;
                 _score.AddSpeed(speed);
+            }
 
-                // Add bonus multiplier based on speed.
-                var speedMultiplier = (int)(speed / _metersPerSecondMultiplierThreshold);
-                return _score.AddScore(speedMultiplier);
-            }
-            else
-            {
-                return _score.AddScore();
-            }
+            // Õ®π˝ÀŸ∂»…Ë÷√ RawScore£®”√”⁄ UI ≈–∂®£©£¨√ø m/s = 10 ∑÷
+            RawScore = Mathf.RoundToInt(Mathf.Clamp(speed * 10f, 0, 100));
+
+            // æˆ∂®º”≥…±∂ ˝£®”√”⁄œ‘ æµ√∑÷£©
+            int speedMultiplier = Mathf.Max(1, Mathf.FloorToInt(speed / _metersPerSecondMultiplierThreshold));
+            int finalScore = RawScore * speedMultiplier;
+
+            LastScore = _score.AddScore(finalScore);
         }
     }
 }

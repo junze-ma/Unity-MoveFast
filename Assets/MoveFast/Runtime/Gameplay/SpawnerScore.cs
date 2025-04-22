@@ -15,16 +15,15 @@ namespace Oculus.Interaction.MoveFast
 
         public void Modify(GameObject instance)
         {
-            int score = _hitDetector.LastScore;
+            int displayScore = _hitDetector.LastScore;
+            int rawScore = _hitDetector.RawScore;
 
-            // 设置分数文本
             var text = instance.GetComponentInChildren<TextMeshProUGUI>();
             if (text != null)
             {
-                text.text = score.ToString();
+                text.text = displayScore.ToString();
             }
 
-            // 获取图标
             Transform good = instance.transform.Find("Good");
             Transform perfect = instance.transform.Find("Perfect");
             Transform miss = instance.transform.Find("Miss");
@@ -35,13 +34,16 @@ namespace Oculus.Interaction.MoveFast
 
             GameObject iconToShow = null;
 
-            if (score < 50 && good)
+            if (_hitDetector.GetComponent<HandHitDetector>().PoseWasCorrect)
             {
-                iconToShow = good.gameObject;
-            }
-            else if (score >= 50 && perfect)
-            {
-                iconToShow = perfect.gameObject;
+                if (rawScore < 50 && good)
+                {
+                    iconToShow = good.gameObject;
+                }
+                else if (rawScore >= 50 && perfect)
+                {
+                    iconToShow = perfect.gameObject;
+                }
             }
             else if (miss)
             {
