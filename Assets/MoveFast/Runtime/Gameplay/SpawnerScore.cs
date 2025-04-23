@@ -6,22 +6,23 @@ namespace Oculus.Interaction.MoveFast
 {
     public class SpawnerScore : MonoBehaviour, ISpawnerModifier
     {
-        private ScoreIncrementer _hitDetector;
+        private ScoreIncrementer _scoreIncrementer;
+
+        // 阈值（你可以在 Inspector 中调整）
+        [SerializeField]
+        private float perfectSpeedThreshold = 5f;
 
         public void Awake()
         {
-            _hitDetector = GetComponentInParent<ScoreIncrementer>();
+            _scoreIncrementer = GetComponentInParent<ScoreIncrementer>();
         }
 
         public void Modify(GameObject instance)
         {
-            int displayScore = _hitDetector.LastScore;
-            int rawScore = _hitDetector.RawScore;
-
             var text = instance.GetComponentInChildren<TextMeshProUGUI>();
             if (text != null)
             {
-                text.text = displayScore.ToString();
+                text.text = _scoreIncrementer.LastScore.ToString(); // 分数字体仍然使用 LastScore 显示
             }
 
             Transform good = instance.transform.Find("Good");
@@ -34,20 +35,30 @@ namespace Oculus.Interaction.MoveFast
 
             GameObject iconToShow = null;
 
-            if (_hitDetector.GetComponent<HandHitDetector>().PoseWasCorrect)
+            var hitDetector = _scoreIncrementer.GetComponent<HandHitDetector>();
+            var hand = hitDetector.LastHand;
+
+            if (hand != null && hand.TryGetAspect<RawHandVelocity>(out var velocityCalculator))
             {
-                if (rawScore < 50 && good)
+                float speed = velocityCalculator.CalculateThrowVelocity(instance.transform).LinearVelocity.magnitude;
+
+                Debug.Log($"[SpawnerScore] Punch Speed = {speed:F2} m/s");
+
+                if (hitDetector.PoseWasCorrect)
                 {
-                    iconToShow = good.gameObject;
+                    if (speed >= perfectSpeedThreshold && perfect)
+                    {
+                        iconToShow = perfect.gameObject;
+                    }
+                    else if (speed < perfectSpeedThreshold && good)
+                    {
+                        iconToShow = good.gameObject;
+                    }
                 }
-                else if (rawScore >= 50 && perfect)
+                else if (miss)
                 {
-                    iconToShow = perfect.gameObject;
+                    iconToShow = miss.gameObject;
                 }
-            }
-            else if (miss)
-            {
-                iconToShow = miss.gameObject;
             }
 
             if (iconToShow != null)
@@ -60,7 +71,10 @@ namespace Oculus.Interaction.MoveFast
         private IEnumerator HideAfterDelay(GameObject go)
         {
             yield return new WaitForSeconds(0.8f);
-            if (go != null) go.SetActive(false);
+            if (go != null)
+            {
+                go.SetActive(false);
+            }
         }
     }
 }
