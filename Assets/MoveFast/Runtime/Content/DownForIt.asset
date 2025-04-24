@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7862ef75246c1b04db99c25d7e852087, type: 3}
   m_Name: DownForIt
   m_EditorClassIdentifier: 
-  _trackCoverArt: {fileID: 21300000, guid: ff410a233f45f5b4aa8a73306e806677, type: 3}
-  _trackName: Down For It
-  _trackArtist: MMI
-  _trackGenre: Rock/Electric
+  _trackCoverArt: {fileID: 21300000, guid: 16b10a12bdde37b45a41d2cd4cd756b1, type: 3}
+  _trackName: Serious AR Training
+  _trackArtist: LYY/MJZ
+  _trackGenre: Standard
   _trackBPM: 100
   _trackDifficulty: {fileID: 21300000, guid: b75fde3a60604c8458cb1b26c6b383c1, type: 3}

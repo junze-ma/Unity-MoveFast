@@ -31,25 +31,34 @@ namespace Oculus.Interaction.MoveFast
             _director = GetComponent<PlayableDirector>();
             _timeRanges = MarkerTrack.GetTimeRanges(_director);
 
-            _director.RebuildGraph();
+            Log($"[Tutorial Init] Found {_timeRanges.Count} marker ranges.");
+            foreach (var range in _timeRanges)
+            {
+                Log($"[Marker Detected] {range.TimelineName} from {range.Start:F2}s to {range.End:F2}s");
+            }
 
+            _director.RebuildGraph();
             _director.played += StartTutorial;
             _director.stopped += EndTutorial;
         }
 
-
         private void StartTutorial(PlayableDirector obj)
         {
+            Log("[Tutorial] StartTutorial triggered");
             _index = -1;
 
             HandHitDetector.TutorialMode = true;
+
             _scoreKeeper.WhenChanged -= Next;
             _scoreKeeper.WhenChanged += Next;
+
             Next(true);
         }
 
         private void EndTutorial(PlayableDirector obj)
         {
+            Log("[Tutorial] EndTutorial triggered");
+
             HandHitDetector.TutorialMode = false;
             _scoreKeeper.WhenChanged -= Next;
             _index = -1;
@@ -65,23 +74,38 @@ namespace Oculus.Interaction.MoveFast
             {
                 HandHitDetector.TutorialMode = false;
             }
+
             if (DetectBlock())
             {
+                Log("[Tutorial] Blocking condition met — calling Next()");
                 Next();
             }
         }
 
         private bool DetectBlock()
         {
-            // dont bother checking for blocks on the punching steps
-            if (_index < _blockIndex) return false;
-            // dont bother if the directors not playing
-            if (!_director.playableGraph.IsValid()) return false;
-            // dont bother if the director isnt at a stop/pause point
-            bool directorIsAtEnd = _director.time == _director.playableGraph.GetRootPlayable(0).GetDuration();
-            if (!directorIsAtEnd) return false;
+            if (_index < _blockIndex)
+            {
+                Log($"[DetectBlock] Index {_index} < blockIndex {_blockIndex} — skip block check.");
+                return false;
+            }
 
-            return _isBlocking;
+            if (!_director.playableGraph.IsValid())
+            {
+                Log("[DetectBlock] PlayableGraph is not valid.");
+                return false;
+            }
+
+            bool directorIsAtEnd = _director.time >= _director.playableGraph.GetRootPlayable(0).GetDuration();
+            if (!directorIsAtEnd)
+            {
+                Log($"[DetectBlock] Director not at end: {_director.time:F2} / {_director.playableGraph.GetRootPlayable(0).GetDuration():F2}");
+                return false;
+            }
+
+            bool blocking = _isBlocking == null ? false : _isBlocking.Active;
+            Log($"[DetectBlock] blocking={blocking}");
+            return blocking;
         }
 
         public void Next()
@@ -91,22 +115,38 @@ namespace Oculus.Interaction.MoveFast
 
         public void Next(bool forceIndex)
         {
-            Debug.Log("Next");
-            if (Time.time - _lastNext < 1 && !forceIndex) return; // HACK dont allow the user to progress too fast
-            _lastNext = Time.time;
+            if (Time.time - _lastNext < 1f && !forceIndex)
+            {
+                Log("[Tutorial] Too fast, wait for cooldown.");
+                return;
+            }
 
+            _lastNext = Time.time;
             _index++;
 
-            var end = _index >= _timeRanges.Count;
-            var time = end ? _director.playableAsset.duration : _timeRanges[_index].End;
+            bool end = _index >= _timeRanges.Count;
+            double time = end ? _director.playableAsset.duration : _timeRanges[_index].End;
+
             _director.playableGraph.GetRootPlayable(0).SetDuration(time);
-            Debug.Log($"Next 2 {_index} {time}");
+
+            Log($"[Tutorial] Next triggered — Index {_index}, jump to time: {time:F2}, end={end}");
 
             if (end)
             {
-                Debug.Log("Next 2");
+                Log("[Tutorial] Tutorial finished, ending...");
                 EndTutorial(null);
-                _index = -1;
+            }
+        }
+
+        /// <summary>
+        /// 用于调试输出，自动发到 DebugOverlay 和 Console
+        /// </summary>
+        private void Log(string msg)
+        {
+            Debug.Log(msg);
+            if (DebugOverlay.Instance != null)
+            {
+                DebugOverlay.Instance.Log(msg);
             }
         }
     }
