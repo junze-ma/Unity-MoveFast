@@ -1,28 +1,18 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
-
 using TMPro;
 using UnityEngine;
 
 namespace Oculus.Interaction.MoveFast
 {
-    /// <summary>
-    /// Handles the ui for the score/combo card
-    /// </summary>
     public class ScoreCardUI : MonoBehaviour
     {
         [Header("Components")]
-        [SerializeField]
-        private TextMeshProUGUI _totalScoreText;
-        [SerializeField]
-        private TextMeshProUGUI _comboScoreText;
-        [SerializeField]
-        private TextMeshProUGUI _multiplierText;
-        [SerializeField]
-        private TextMeshProUGUI _multiplierWordText;
+        [SerializeField] private TextMeshProUGUI[] _totalScoreTexts;
+        [SerializeField] private TextMeshProUGUI[] _comboScoreTexts;
+        [SerializeField] private TextMeshProUGUI[] _multiplierTexts;
+        [SerializeField] private TextMeshProUGUI[] _multiplierWordTexts;
 
         [Header("References")]
-        [SerializeField]
-        private ScoreKeeper _scoreKeeper;
+        [SerializeField] private ScoreKeeper _scoreKeeper;
 
         private void Awake()
         {
@@ -32,22 +22,25 @@ namespace Oculus.Interaction.MoveFast
 
         private void UpdateScoreCardUI()
         {
-            _totalScoreText.SetText(_scoreKeeper.Score.ToString());
-            _comboScoreText.SetText(_scoreKeeper.HitsInARow.ToString());
-            _multiplierText.SetText($"x{_scoreKeeper.Combo}");
-            UpdateMultiplierWord();
+            foreach (var txt in _totalScoreTexts)
+                txt.SetText(_scoreKeeper.Score.ToString());
+
+            foreach (var txt in _comboScoreTexts)
+                txt.SetText(_scoreKeeper.HitsInARow.ToString());
+
+            foreach (var txt in _multiplierTexts)
+                txt.SetText($"x{_scoreKeeper.Combo}");
+
+            foreach (var txt in _multiplierWordTexts)
+                txt.SetText(GetMultiplierWord());
         }
 
-        private void UpdateMultiplierWord()
+        private string GetMultiplierWord()
         {
-            if (_scoreKeeper.Combo < 10)
-                _multiplierWordText.SetText("");
-            else if (_scoreKeeper.Combo >= 10)
-                _multiplierWordText.SetText("Awesome!");
-            else if (_scoreKeeper.Combo >= 15)
-                _multiplierWordText.SetText("Keep Going");
-            else if (_scoreKeeper.Combo >= 20)
-                _multiplierWordText.SetText("Amazing!");
+            if (_scoreKeeper.Combo >= 20) return "Amazing!";
+            if (_scoreKeeper.Combo >= 15) return "Keep Going";
+            if (_scoreKeeper.Combo >= 10) return "Awesome!";
+            return "";
         }
     }
 }
